@@ -179,8 +179,6 @@ Jadval `vercel.json` da (repo ildizi):
 ```json
 {
   "crons": [
-    { "path": "/api/cron/sms", "schedule": "*/5 * * * *" },
-    { "path": "/api/cron/reminders", "schedule": "0 * * * *" },
     { "path": "/api/cron/birthdays", "schedule": "0 4 * * *" },
     { "path": "/api/cron/daily-report", "schedule": "0 16 * * *" }
   ]
@@ -204,7 +202,7 @@ curl -s -H "Authorization: Bearer $CRON_SECRET" https://<domen>/api/cron/sms
 
 ### 5.2 Eslatmalar
 
-- Vercel Hobby rejasida cron kuniga 1 marta ishlaydi va aniq daqiqa kafolatlanmaydi — ishlab chiqarish uchun Pro kerak.
+- Vercel **Hobby** rejasida cron kuniga 1 marta va koʻpi bilan 2 ta boʻlishi mumkin; kunlik boʻlmagan jadval deploy'ni xato bilan toʻxtatadi (`Hobby accounts are limited to daily cron jobs`). Shuning uchun repodagi `vercel.json` da faqat 2 ta kunlik cron bor, toʻliq jadval esa `vercel.pro.json` da (Pro rejada `cp vercel.pro.json vercel.json`). Hobby'da qolsangiz, `/api/cron/sms` va `/api/cron/reminders` ni tashqi cron xizmati (masalan cron-job.org) orqali `Authorization: Bearer $CRON_SECRET` bilan chaqiring. Batafsil: [DEPLOY.md](DEPLOY.md).
 - `daily-report` soatlik ishga tushirilsa ham bir klinikaga kuniga faqat bir marta yuboriladi (`AuditLog` belgisi),
   har klinika oʻz `dailyReportHour` soatida oladi (klinika vaqt zonasi boʻyicha).
 - Har bir endpoint `maxDuration = 60` s bilan ishlaydi.
