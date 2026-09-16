@@ -1,0 +1,498 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────
+   "Clinical Luxury Dark" — dizayn tokenlari
+   Spec palitrasi (hex) + shadcn/ui semantik ranglar (HSL kanallari, hsl() siz)
+   ───────────────────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    /* ── Spec palitrasi ── */
+    --bg-base: #060810;
+    --bg-elevated: #0d1220;
+    --surface: #131a2b;
+    --border: #1f2a40;
+    --accent: #00d4ff;
+    --accent-2: #7c5cff;
+    --accent-3: #00ffb2;
+    --text: #eaf0ff;
+    --text-muted: #8a99b8;
+    --danger: #ff4d6d;
+    --warning: #ffb547;
+    --radius: 12px;
+    --gradient-accent: linear-gradient(135deg, #00d4ff 0%, #7c5cff 100%);
+
+    /* ── shadcn/ui semantik ranglar (HSL) ── */
+    --background: 228 45% 4%; /* #060810 */
+    --foreground: 223 100% 96%; /* #EAF0FF */
+    --card: 223 39% 12%; /* #131A2B */
+    --card-foreground: 223 100% 96%;
+    --popover: 224 42% 9%; /* #0D1220 */
+    --popover-foreground: 223 100% 96%;
+    --primary: 190 100% 50%; /* #00D4FF */
+    --primary-foreground: 228 45% 4%; /* #060810 */
+    --secondary: 220 35% 19%; /* #1F2A40 */
+    --secondary-foreground: 223 100% 96%;
+    --muted: 223 39% 12%; /* #131A2B */
+    --muted-foreground: 220 24% 63%; /* #8A99B8 */
+    --accent-hsl: 190 100% 50%;
+    --destructive: 349 100% 65%; /* #FF4D6D */
+    --destructive-foreground: 228 45% 4%; /* #060810 — AA kontrast (6.2:1) */
+    --border-hsl: 220 35% 19%; /* #1F2A40 */
+    --input: 220 35% 19%;
+    --ring: 190 100% 50%;
+
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text);
+    font-feature-settings:
+      'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgba(0, 212, 255, 0.32);
+    color: var(--text);
+  }
+
+  /* Klaviatura fokusi — hamma interaktiv elementlar uchun koʻrinadigan halqa */
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading), Manrope, Inter, system-ui, sans-serif;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  [role='button'] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role='button'][aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  input[type='search']::-webkit-search-decoration,
+  input[type='search']::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+
+  /* ── Scrollbar (WebKit + Firefox) ── */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #2b3a57 transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #2b3a57;
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #3a4b6e;
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Sonner (toast) palitraga moslash */
+  html [data-sonner-toaster][data-theme='dark'] {
+    --normal-bg: var(--bg-elevated);
+    --normal-border: var(--border);
+    --normal-text: var(--text);
+    --border-radius: var(--radius);
+    font-family: var(--font-body), Inter, system-ui, sans-serif;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Komponent utilitalari
+   ───────────────────────────────────────────────────────────────────────── */
+@layer components {
+  /* Shisha yuza: blur + 1px gradient chegara (mask-composite) */
+  .glass,
+  .glass-strong {
+    position: relative;
+    isolation: isolate;
+    border-radius: var(--radius);
+    background-color: rgba(19, 26, 43, 0.55);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    backdrop-filter: blur(20px) saturate(140%);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+      0 20px 50px -20px rgba(0, 0, 0, 0.6);
+  }
+  .glass-strong {
+    background-color: rgba(13, 18, 32, 0.82);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    backdrop-filter: blur(28px) saturate(160%);
+  }
+  .glass::before,
+  .glass-strong::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 212, 255, 0.55) 0%,
+      rgba(124, 92, 255, 0.28) 45%,
+      rgba(255, 255, 255, 0.06) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .glass-strong::before {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 212, 255, 0.4) 0%,
+      rgba(124, 92, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
+  }
+
+  /* Gradient matn */
+  .text-gradient {
+    background-image: var(--gradient-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Nur (glow) */
+  .glow {
+    box-shadow:
+      0 0 0 1px rgba(0, 212, 255, 0.25),
+      0 0 24px rgba(0, 212, 255, 0.25);
+  }
+  .glow-violet {
+    box-shadow:
+      0 0 0 1px rgba(124, 92, 255, 0.3),
+      0 0 32px rgba(124, 92, 255, 0.35);
+  }
+  .glow-mint {
+    box-shadow:
+      0 0 0 1px rgba(0, 255, 178, 0.3),
+      0 0 24px rgba(0, 255, 178, 0.3);
+  }
+
+  /* Shovqin (noise) qatlami — feTurbulence SVG, 3% */
+  .noise {
+    position: relative;
+  }
+  .noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0.03;
+    mix-blend-mode: overlay;
+    background-repeat: repeat;
+    background-size: 220px 220px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Ingichka scrollbar */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #2b3a57 transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #2b3a57;
+    border-radius: 999px;
+    border: 0;
+    background-clip: border-box;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: #3a4b6e;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Nozik toʻr fon */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(138, 153, 184, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(138, 153, 184, 0.07) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .bg-grid-fade {
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 100%);
+  }
+
+  /* Karta yuzasi */
+  .card-surface {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+      0 20px 50px -20px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Kiritish maydoni yuzasi */
+  .input-surface {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--text);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .input-surface::placeholder {
+    color: rgba(138, 153, 184, 0.75);
+  }
+  .input-surface:hover {
+    border-color: #2b3a57;
+  }
+  .input-surface:focus,
+  .input-surface:focus-within {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.22);
+  }
+
+  /* Klaviatura tugmasi */
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 1.5rem;
+    height: 1.375rem;
+    padding: 0 0.375rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  /* Shimmer (Skeleton) */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--surface);
+  }
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(234, 240, 255, 0.06) 40%,
+      rgba(234, 240, 255, 0.1) 50%,
+      rgba(234, 240, 255, 0.06) 60%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: ds-shimmer 2.5s linear infinite;
+  }
+
+  /* Gradient chegarali element (glass siz) */
+  .border-gradient {
+    position: relative;
+    isolation: isolate;
+  }
+  .border-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-accent);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Utilitalar
+   ───────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  .font-heading {
+    letter-spacing: -0.03em;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .touch-callout-none {
+    -webkit-touch-callout: none;
+  }
+}
+
+/* Skeleton shimmer (Tailwind keyframes faqat animate-shimmer ishlatilganda chiqadi — bu mustaqil) */
+@keyframes ds-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Maxsus kursor yoqilganda tizim kursori yashiriladi (faqat desktop, pointer: fine) */
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
+}
+
+/* Kamaytirilgan harakat */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Chop etish */
+@page {
+  margin: 8mm;
+}
+@media print {
+  .no-print,
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  a {
+    color: inherit;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}

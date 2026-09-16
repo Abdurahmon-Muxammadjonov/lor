@@ -1,0 +1,509 @@
+// LOR CRM — Prisma schema
+// Barcha pul summalari Decimal(14,2) — butun soʻm (float ISHLATILMAYDI).
+// Har bir jadval klinika boʻyicha izolyatsiya qilinadi (clinicId).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ───────────────────────────── KLINIKA ─────────────────────────────
+
+model Clinic {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  phone         String
+  email         String?
+  address       String?
+  city          String?
+  logoUrl       String?
+  timezone      String   @default("Asia/Tashkent")
+  childAgeLimit Int      @default(14)
+  currency      String   @default("UZS")
+  roundTo       Int      @default(100)
+  workStart     String   @default("08:00")
+  workEnd       String   @default("20:00")
+  slotMinutes   Int      @default(20)
+  kioskKey      String   @unique @default(cuid())
+  ticketFooter  String   @default("Sogʻligʻingiz — biz uchun eng muhimi")
+  // Printer / SMS / Telegram sozlamalari (PrinterSettings, SmsSettings, TelegramSettings — src/lib/settings/types.ts)
+  settings      Json     @default("{}")
+  plan          Plan     @default(START)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users        User[]
+  patients     Patient[]
+  categories   ServiceCategory[]
+  services     Service[]
+  visits       Visit[]
+  payments     Payment[]
+  queues       Queue[]
+  appointments Appointment[]
+  cashShifts   CashShift[]
+  auditLogs    AuditLog[]
+  smsLogs      SmsLog[]
+}
+
+enum Plan {
+  START
+  PRO
+  CLINIC
+}
+
+// ───────────────────────────── XODIMLAR ─────────────────────────────
+
+model User {
+  id             String     @id @default(cuid())
+  clinicId       String
+  clinic         Clinic     @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  login          String     @unique
+  email          String?    @unique
+  password       String
+  fullName       String
+  role           Role
+  phone          String?
+  specialty      String?
+  room           String?
+  color          String     @default("#00D4FF")
+  salaryType     SalaryType @default(PERCENT)
+  salaryValue    Decimal    @default(0) @db.Decimal(14, 2)
+  // Haftalik ish jadvali: WeeklySchedule (src/lib/settings/types.ts)
+  schedule       Json       @default("{}")
+  sessionVersion Int        @default(1)
+  isActive       Boolean    @default(true)
+  lastLoginAt    DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  visits              Visit[]              @relation("VisitDoctor")
+  payments            Payment[]            @relation("PaymentCashier")
+  appointments        Appointment[]        @relation("AppointmentDoctor")
+  createdAppointments Appointment[]        @relation("AppointmentCreator")
+  cashShifts          CashShift[]
+  queuesAsDoctor      Queue[]              @relation("QueueDoctor")
+  auditLogs           AuditLog[]
+  passwordResets      PasswordResetToken[]
+
+  @@index([clinicId, role])
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  DOCTOR
+  RECEPTION
+  CASHIER
+}
+
+enum SalaryType {
+  PERCENT
+  FIXED
+}
+
+// ───────────────────────────── XIZMATLAR ─────────────────────────────
+
+model ServiceCategory {
+  id        String    @id @default(cuid())
+  clinicId  String
+  clinic    Clinic    @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  name      String
+  nameRu    String
+  icon      String?
+  order     Int       @default(0)
+  services  Service[]
+  createdAt DateTime  @default(now())
+
+  @@unique([clinicId, name])
+}
+
+model Service {
+  id         String          @id @default(cuid())
+  clinicId   String
+  clinic     Clinic          @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   ServiceCategory @relation(fields: [categoryId], references: [id])
+  code       String
+  name       String // UZ
+  nameRu     String // RU
+  unit       String          @default("ta") // ta, seans, kun
+
+  // 4 xil narx (kattalar/bolalar × dori bilan/dorisiz)
+  priceAdultNoMed Decimal @db.Decimal(14, 2)
+  priceAdultMed   Decimal @db.Decimal(14, 2)
+  priceChildNoMed Decimal @db.Decimal(14, 2)
+  priceChildMed   Decimal @db.Decimal(14, 2)
+
+  allowHalf        Boolean  @default(true)
+  medicineOptional Boolean  @default(true) // false = doim dori bilan
+  durationMin      Int      @default(20)
+  defaultOrgan     Organ?
+  isActive         Boolean  @default(true)
+  order            Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  lines TreatmentLine[]
+
+  @@unique([clinicId, code])
+  @@index([clinicId, categoryId])
+  @@index([clinicId, isActive])
+}
+
+// ───────────────────────────── BEMORLAR ─────────────────────────────
+
+model Patient {
+  id             String   @id @default(cuid())
+  clinicId       String
+  clinic         Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  cardNumber     String // avtomatik: 2026-00042
+  fullName       String
+  birthDate      DateTime @db.Date
+  gender         Gender
+  phone          String
+  phone2         String?
+  address        String?
+  allergies      String?
+  chronic        String?
+  notes          String?
+  source         String?
+  telegramChatId String?
+  smsConsent     Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  visits       Visit[]
+  appointments Appointment[]
+  queues       Queue[]
+  smsLogs      SmsLog[]
+
+  @@unique([clinicId, cardNumber])
+  @@index([clinicId, phone])
+  @@index([clinicId, fullName])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+// ───────────────────────────── QABUL ─────────────────────────────
+
+model Visit {
+  id                  String       @id @default(cuid())
+  clinicId            String
+  clinic              Clinic       @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  patientId           String
+  patient             Patient      @relation(fields: [patientId], references: [id])
+  doctorId            String
+  doctor              User         @relation("VisitDoctor", fields: [doctorId], references: [id])
+  queueId             String?      @unique
+  queue               Queue?       @relation(fields: [queueId], references: [id])
+  appointmentId       String?      @unique
+  appointment         Appointment? @relation(fields: [appointmentId], references: [id])
+  complaint           String?
+  anamnesis           String?
+  examination         String?
+  diagnosis           String?
+  icd10               String?
+  plan                String?
+  recommendations     String?
+  status              VisitStatus  @default(OPEN)
+  globalDiscountType  DiscountType @default(NONE)
+  globalDiscountValue Decimal      @default(0) @db.Decimal(14, 2)
+  totalGross          Decimal      @default(0) @db.Decimal(14, 2)
+  discount            Decimal      @default(0) @db.Decimal(14, 2)
+  totalNet            Decimal      @default(0) @db.Decimal(14, 2)
+  paidAmount          Decimal      @default(0) @db.Decimal(14, 2)
+  completedAt         DateTime?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  lines    TreatmentLine[]
+  payments Payment[]
+
+  @@index([clinicId, createdAt])
+  @@index([clinicId, patientId])
+  @@index([clinicId, doctorId, createdAt])
+  @@index([clinicId, status])
+}
+
+enum VisitStatus {
+  OPEN
+  COMPLETED
+  CANCELLED
+}
+
+model TreatmentLine {
+  id            String       @id @default(cuid())
+  visitId       String
+  visit         Visit        @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  serviceId     String
+  service       Service      @relation(fields: [serviceId], references: [id])
+  serviceCode   String // snapshot
+  serviceName   String // snapshot (UZ) — narx keyin oʻzgarsa ham tarix buzilmaydi
+  serviceNameRu String // snapshot (RU)
+  unit          String       @default("ta")
+  patientType   PatientType
+  withMedicine  Boolean
+  quantity      Decimal      @db.Decimal(6, 1) // 0.5 qadam
+  unitPrice     Decimal      @db.Decimal(14, 2) // snapshot
+  grossTotal    Decimal      @db.Decimal(14, 2)
+  discountType  DiscountType @default(NONE)
+  discountValue Decimal      @default(0) @db.Decimal(14, 2)
+  discountTotal Decimal      @default(0) @db.Decimal(14, 2)
+  lineTotal     Decimal      @db.Decimal(14, 2)
+  side          Side? // LOR: chap/oʻng/ikkala
+  organ         Organ? // quloq/burun/tomoq
+  detail        String? // anatomik aniqlik: "gaymor sinusi", "tashqi quloq" ...
+  note          String?
+  order         Int          @default(0)
+  createdAt     DateTime     @default(now())
+
+  @@index([visitId])
+  @@index([serviceId])
+}
+
+enum PatientType {
+  ADULT
+  CHILD
+}
+
+enum DiscountType {
+  NONE
+  PERCENT
+  FIXED
+}
+
+enum Side {
+  LEFT
+  RIGHT
+  BOTH
+}
+
+enum Organ {
+  EAR
+  NOSE
+  THROAT
+  LARYNX
+  OTHER
+}
+
+// ───────────────────────────── KASSA ─────────────────────────────
+
+model Payment {
+  id        String     @id @default(cuid())
+  clinicId  String
+  clinic    Clinic     @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  visitId   String
+  visit     Visit      @relation(fields: [visitId], references: [id])
+  shiftId   String?
+  shift     CashShift? @relation(fields: [shiftId], references: [id])
+  amount    Decimal    @db.Decimal(14, 2) // manfiy = qaytarish (refund)
+  method    PayMethod
+  cashierId String
+  cashier   User       @relation("PaymentCashier", fields: [cashierId], references: [id])
+  receiptNo String?
+  note      String?
+  createdAt DateTime   @default(now())
+
+  @@index([clinicId, createdAt])
+  @@index([visitId])
+  @@index([shiftId])
+}
+
+enum PayMethod {
+  CASH
+  CARD
+  TRANSFER
+  CLICK
+  PAYME
+}
+
+model CashShift {
+  id            String    @id @default(cuid())
+  clinicId      String
+  clinic        Clinic    @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  cashierId     String
+  cashier       User      @relation(fields: [cashierId], references: [id])
+  openedAt      DateTime  @default(now())
+  closedAt      DateTime?
+  openingCash   Decimal   @default(0) @db.Decimal(14, 2)
+  closingCash   Decimal?  @db.Decimal(14, 2)
+  // Yopilganda hisoblangan jamlar (snapshot)
+  totalCash     Decimal   @default(0) @db.Decimal(14, 2)
+  totalCard     Decimal   @default(0) @db.Decimal(14, 2)
+  totalTransfer Decimal   @default(0) @db.Decimal(14, 2)
+  totalClick    Decimal   @default(0) @db.Decimal(14, 2)
+  totalPayme    Decimal   @default(0) @db.Decimal(14, 2)
+  note          String?
+
+  payments Payment[]
+
+  @@index([clinicId, openedAt])
+  @@index([clinicId, cashierId, closedAt])
+}
+
+// ───────────────────────────── NAVBAT ─────────────────────────────
+
+model Queue {
+  id        String      @id @default(cuid())
+  clinicId  String
+  clinic    Clinic      @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  date      DateTime    @db.Date // navbat kuni — har kuni 001 dan boshlanadi
+  number    String // A-001
+  prefix    String // A = shifokor qabuli, B = qayta koʻrik, C = analiz, D = kassa
+  seq       Int // 1, 2, 3 ...
+  type      QueueType
+  patientId String?
+  patient   Patient?    @relation(fields: [patientId], references: [id])
+  doctorId  String?
+  doctor    User?       @relation("QueueDoctor", fields: [doctorId], references: [id])
+  room      String?
+  status    QueueStatus @default(WAITING)
+  calledAt  DateTime?
+  servedAt  DateTime?
+  doneAt    DateTime?
+  printedAt DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  visit Visit?
+
+  @@unique([clinicId, date, number])
+  @@index([clinicId, date, status])
+  @@index([clinicId, updatedAt])
+}
+
+enum QueueType {
+  DOCTOR
+  RECHECK
+  LAB
+  CASHIER
+}
+
+enum QueueStatus {
+  WAITING
+  CALLED
+  SERVING
+  DONE
+  SKIPPED
+}
+
+// ───────────────────────────── YOZILISH (KALENDAR) ─────────────────────────────
+
+model Appointment {
+  id             String            @id @default(cuid())
+  clinicId       String
+  clinic         Clinic            @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  patientId      String
+  patient        Patient           @relation(fields: [patientId], references: [id])
+  doctorId       String
+  doctor         User              @relation("AppointmentDoctor", fields: [doctorId], references: [id])
+  createdById    String?
+  createdBy      User?             @relation("AppointmentCreator", fields: [createdById], references: [id])
+  startAt        DateTime
+  endAt          DateTime
+  status         AppointmentStatus @default(SCHEDULED)
+  note           String?
+  reminderSentAt DateTime?
+  confirmSentAt  DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  visit Visit?
+
+  @@index([clinicId, startAt])
+  @@index([clinicId, doctorId, startAt])
+  @@index([clinicId, patientId])
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  ARRIVED
+  DONE
+  CANCELLED
+  NO_SHOW
+}
+
+// ───────────────────────────── XAVFSIZLIK / AUDIT ─────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  clinicId  String?
+  clinic    Clinic?  @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String // CREATE | UPDATE | DELETE | LOGIN | PRICE_CHANGE | PAYMENT | REFUND | SHIFT_CLOSE ...
+  entity    String // Service | Payment | Visit | User | Clinic ...
+  entityId  String?
+  before    Json?
+  after     Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([clinicId, createdAt])
+  @@index([clinicId, entity, entityId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String // `${login}|${ip}`
+  success   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+model SmsLog {
+  id         String    @id @default(cuid())
+  clinicId   String
+  clinic     Clinic    @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  patientId  String?
+  patient    Patient?  @relation(fields: [patientId], references: [id])
+  phone      String
+  text       String
+  kind       SmsKind
+  status     SmsStatus @default(PENDING)
+  provider   String    @default("eskiz")
+  providerId String?
+  error      String?
+  sentAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([clinicId, createdAt])
+}
+
+enum SmsKind {
+  APPOINTMENT_CONFIRM
+  APPOINTMENT_REMINDER
+  BIRTHDAY
+  CUSTOM
+}
+
+enum SmsStatus {
+  PENDING
+  SENT
+  FAILED
+}

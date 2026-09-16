@@ -1,0 +1,49 @@
+{
+  "name": "LOR CRM",
+  "short_name": "LOR CRM",
+  "description": "LOR (quloq-burun-tomoq) klinikalari uchun navbat, muolaja kalkulyatori, kassa va hisobotlar tizimi",
+  "id": "/dashboard",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "uz",
+  "dir": "ltr",
+  "background_color": "#060810",
+  "theme_color": "#060810",
+  "categories": ["medical", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Navbat",
+      "short_name": "Navbat",
+      "url": "/dashboard/queue",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Bemorlar",
+      "short_name": "Bemorlar",
+      "url": "/dashboard/patients",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Kassa",
+      "short_name": "Kassa",
+      "url": "/dashboard/cashier",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}

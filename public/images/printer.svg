@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-labelledby="t">
+  <title id="t">Termo printer</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00D4FF"/>
+      <stop offset="1" stop-color="#7C5CFF"/>
+    </linearGradient>
+    <linearGradient id="s" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B2540"/>
+      <stop offset="1" stop-color="#0D1220"/>
+    </linearGradient>
+  </defs>
+  <!-- korpus -->
+  <rect x="14" y="20" width="68" height="34" rx="9" fill="url(#s)" stroke="url(#g)" stroke-width="2"/>
+  <rect x="22" y="14" width="52" height="10" rx="4" fill="#131A2B" stroke="#1F2A40"/>
+  <!-- LED va tugma -->
+  <circle cx="26" cy="37" r="2.5" fill="#00FFB2"/>
+  <rect x="62" y="33" width="12" height="8" rx="2" fill="#131A2B" stroke="#2B3A57"/>
+  <!-- qogʻoz chiqish joyi -->
+  <rect x="26" y="46" width="44" height="3" rx="1.5" fill="#060810"/>
+  <!-- talon -->
+  <path d="M30 49h36v28l-3 3-3-3-3 3-3-3-3 3-3-3-3 3-3-3-3 3-3-3-3 3-3-3z" fill="#F7F7F2"/>
+  <rect x="35" y="54" width="26" height="2.5" rx="1.25" fill="#5A6275"/>
+  <text x="48" y="69" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="10" font-weight="700" fill="#0F1320">A-014</text>
+  <rect x="38" y="72" width="20" height="1.5" rx="0.75" fill="#B8BCC8"/>
+</svg>

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /api
+Disallow: /kiosk
+Disallow: /display
+Disallow: /print
+
+Sitemap: https://lor.uz/sitemap.xml

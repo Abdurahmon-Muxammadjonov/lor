@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="LOR CRM">
+  <defs>
+    <linearGradient id="lor-accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00D4FF"/>
+      <stop offset="1" stop-color="#7C5CFF"/>
+    </linearGradient>
+    <linearGradient id="lor-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111828"/>
+      <stop offset="1" stop-color="#060810"/>
+    </linearGradient>
+    <radialGradient id="lor-halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#00D4FF" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#00D4FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#lor-bg)"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="#1F2A40"/>
+  <circle cx="30" cy="32" r="22" fill="url(#lor-halo)"/>
+  <!-- Quloq: tashqi chekka (helix) va yumshoq pastki qism (lobe) -->
+  <path d="M25 47 C25 42 18.5 39 18.5 29.5 C18.5 21 24.5 14.5 32 14.5 C39.5 14.5 44.5 20 44.5 26.5 C44.5 32 41 34.5 38 36.5"
+        fill="none" stroke="url(#lor-accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M25 47 C25 50.5 28.5 52.5 32 51"
+        fill="none" stroke="url(#lor-accent)" stroke-width="4" stroke-linecap="round"/>
+  <!-- Quloq: ichki egri (antihelix) -->
+  <path d="M27.5 31 C27.5 25.5 31 22.5 34.5 22.5 C37.5 22.5 39 24.5 39 27"
+        fill="none" stroke="url(#lor-accent)" stroke-width="3.2" stroke-linecap="round" stroke-opacity="0.85"/>
+  <!-- Tovush toʻlqinlari -->
+  <path d="M48 24.5 A10 10 0 0 1 48 39.5" fill="none" stroke="#00D4FF" stroke-width="2.6" stroke-linecap="round" stroke-opacity="0.9"/>
+  <path d="M52.5 20.5 A16 16 0 0 1 52.5 43.5" fill="none" stroke="#7C5CFF" stroke-width="2.4" stroke-linecap="round" stroke-opacity="0.75"/>
+  <circle cx="45" cy="32" r="1.8" fill="#00FFB2"/>
+</svg>

@@ -1,0 +1,11 @@
+/*
+ * Marketing sahifalari uchun qoʻshimcha uslublar.
+ * Reveal elementlari SSR da opacity:0 bilan chiqadi; "harakatni kamaytirish" yoqilgan boʻlsa
+ * ular animatsiyasiz darhol koʻrinishi shart (inline style dan ustun turadi).
+ */
+@media (prefers-reduced-motion: reduce) {
+  .lp-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
