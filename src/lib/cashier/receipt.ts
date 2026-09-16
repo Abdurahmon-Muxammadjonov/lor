@@ -7,6 +7,7 @@ import { formatReceiptNo } from '@/lib/queue-number';
 import { parseClinicSettings } from '@/lib/settings/types';
 import type { ReceiptLine } from '@/lib/printer/types';
 import type { ReceiptViewData } from './types';
+import { getSiteUrl } from '@/lib/site-url';
 
 /**
  * Kassa cheki (server): Prisma qabulidan `ReceiptData` yigʻish va chek raqamini berish.
@@ -40,7 +41,7 @@ export interface ReceiptOptions {
 
 /** APP_URL (yoki NEXTAUTH_URL) — chekdagi QR havolasi uchun */
 export function appUrl(): string {
-  const raw = process.env.APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const raw = getSiteUrl();
   return raw.replace(/\/+$/, '');
 }
 

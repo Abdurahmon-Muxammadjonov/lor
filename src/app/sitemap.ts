@@ -1,9 +1,10 @@
 import type { MetadataRoute } from 'next';
 import { SITE } from '@/data/landing-content';
+import { getSiteUrl } from '@/lib/site-url';
 
 /** Ochiq sahifalar xaritasi (/sitemap.xml). Dashboard, kiosk, print va API kiritilmaydi. */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = (process.env.APP_URL ?? SITE.url).replace(/\/$/, '');
+  const base = getSiteUrl();
   const lastModified = new Date(SITE.legalUpdated);
   return [
     { url: `${base}/`, lastModified, changeFrequency: 'weekly', priority: 1 },

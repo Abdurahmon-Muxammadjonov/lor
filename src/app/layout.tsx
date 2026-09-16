@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Manrope } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { DEFAULT_LOCALE, HTML_LANG, LOCALE_COOKIE, isLocale, type Locale } from '@/i18n/config';
+import { getSiteUrlObject } from '@/lib/site-url';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -20,7 +21,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.APP_URL ?? 'http://localhost:3000'),
+  metadataBase: getSiteUrlObject(),
   title: { default: 'LOR CRM — quloq-burun-tomoq klinikalari uchun tizim', template: '%s · LOR CRM' },
   description:
     'LOR klinikalari uchun navbat, muolaja kalkulyatori, kassa va hisobotlar bir joyda. Talon printeri, SMS eslatmalar, UZ/RU.',
