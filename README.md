@@ -63,9 +63,14 @@ npm run db:studio   # Prisma Studio
 - [`docs/CONTRACTS.md`](docs/CONTRACTS.md) — arxitektura shartnomasi (papkalar, API qoidalari, pul va hisob qoidalari, i18n, dizayn tizimi)
 - [`docs/FOUNDATION.md`](docs/FOUNDATION.md) — UI/shared/effects komponentlari va ularning propslari
 - [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md) — Eskiz SMS, Telegram, Click, Payme, Vercel cron, printer sozlash
+- [`docs/DEPLOY.md`](docs/DEPLOY.md) — Vercel + Supabase ga joylash (env oʻzgaruvchilar, cron cheklovlari, tez-tez uchraydigan xatolar)
 - [`docs/SEED.md`](docs/SEED.md) — demo maʼlumotlar tarkibi
 
 ## Deploy
 
-Vercel + Supabase (yoki boshqa PostgreSQL). `vercel.json` da cron jadvallari: SMS yuborish, eslatmalar,
-tugʻilgan kunlar, kunlik Telegram hisoboti. Cron endpointlari `CRON_SECRET` bilan himoyalangan.
+Toʻliq qoʻllanma: [`docs/DEPLOY.md`](docs/DEPLOY.md) — Supabase bazasi, Vercel env oʻzgaruvchilari,
+cron jadvallari va tez-tez uchraydigan xatolar.
+
+Qisqacha: Supabase'da baza yarating → `prisma migrate deploy` + `db:seed` → Vercel'ga repo'ni import qiling →
+`DATABASE_URL`, `DIRECT_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `APP_URL`, `CRON_SECRET` ni qoʻshing → Deploy.
+`vercel.json` Hobby rejasiga mos (2 ta kunlik cron); Pro'da `vercel.pro.json` dagi toʻliq jadvalga oʻting.
